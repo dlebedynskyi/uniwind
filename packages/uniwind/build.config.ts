@@ -49,9 +49,32 @@ export default defineBuildConfig({
             name: 'metro/metro-transformer',
         },
         {
+            builder: 'rollup',
+            input: './src/webpack',
+            name: 'webpack/index',
+        },
+        {
+            builder: 'rollup',
+            input: './src/webpack/css-entry-loader.ts',
+            name: 'webpack/css-entry-loader',
+        },
+        {
+            builder: 'rollup',
+            input: './src/webpack/injected-loader.ts',
+            name: 'webpack/injected-loader',
+        },
+        {
             builder: 'mkdist',
             input: './src/metro',
             outDir: 'dist/metro',
+            pattern: ['index.d.ts'],
+            declaration: true,
+            format: 'esm',
+        },
+        {
+            builder: 'mkdist',
+            input: './src/webpack',
+            outDir: 'dist/webpack',
             pattern: ['index.d.ts'],
             declaration: true,
             format: 'esm',

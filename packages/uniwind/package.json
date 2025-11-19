@@ -56,6 +56,11 @@
             "import": "./dist/metro/index.mjs",
             "default": "./dist/metro/index.cjs"
         },
+        "./webpack": {
+            "types": "./dist/webpack/index.d.ts",
+            "import": "./dist/webpack/index.mjs",
+            "default": "./dist/webpack/index.cjs"
+        },
         "./types": "./types.d.ts",
         "./package.json": "./package.json"
     },
@@ -63,6 +68,7 @@
         "src",
         "dist",
         "metro",
+        "webpack",
         "uniwind.css",
         "types.d.ts",
         "readme.md"
@@ -84,6 +90,7 @@
         "@types/react": "catalog:",
         "typescript": "catalog:",
         "metro": "0.83.3",
+        "webpack": "5.98.0",
         "dpdm": "3.14.0",
         "unbuild": "3.6.1"
     }

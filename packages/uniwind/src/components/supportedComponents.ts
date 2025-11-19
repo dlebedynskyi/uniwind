@@ -1,0 +1,26 @@
+export const SUPPORTED_COMPONENTS = [
+    'ActivityIndicator',
+    'Button',
+    'FlatList',
+    'Image',
+    'ImageBackground',
+    'InputAccessoryView',
+    'KeyboardAvoidingView',
+    'Modal',
+    'Pressable',
+    'RefreshControl',
+    'SafeAreaView',
+    'ScrollView',
+    'SectionList',
+    'Switch',
+    'Text',
+    'TextInput',
+    'TouchableHighlight',
+    'TouchableNativeFeedback',
+    'TouchableOpacity',
+    'TouchableWithoutFeedback',
+    'View',
+    'VirtualizedList',
+] as const
+
+export type SupportedComponentName = typeof SUPPORTED_COMPONENTS[number]

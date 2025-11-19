@@ -1,6 +1,7 @@
 import { CustomResolutionContext, CustomResolver } from 'metro-resolver'
 import { basename, resolve, sep } from 'node:path'
 import { name } from '../../package.json'
+import { SUPPORTED_COMPONENTS } from '../components/supportedComponents'
 
 type ResolverConfig = {
     platform: string | null
@@ -13,31 +14,6 @@ const thisModuleDist = resolve(__dirname, '../../dist')
 const thisModuleSrc = resolve(__dirname, '../../src')
 
 const isFromThisModule = (filename: string) => filename.startsWith(thisModuleDist) || filename.startsWith(thisModuleSrc)
-
-const SUPPORTED_COMPONENTS = [
-    'ActivityIndicator',
-    'Button',
-    'FlatList',
-    'Image',
-    'ImageBackground',
-    'InputAccessoryView',
-    'KeyboardAvoidingView',
-    'Modal',
-    'Pressable',
-    'RefreshControl',
-    'SafeAreaView',
-    'ScrollView',
-    'SectionList',
-    'Switch',
-    'Text',
-    'TextInput',
-    'TouchableHighlight',
-    'TouchableNativeFeedback',
-    'TouchableOpacity',
-    'TouchableWithoutFeedback',
-    'View',
-    'VirtualizedList',
-]
 
 export const nativeResolver = ({
     context,

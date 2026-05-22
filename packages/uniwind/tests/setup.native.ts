@@ -1,3 +1,4 @@
+import { rmSync } from 'fs'
 import { Dimensions } from 'react-native'
 import { UniwindBundlerConfig } from '../src/bundler/config'
 import { compileCSS } from '../src/bundler/css-compiler'
@@ -10,6 +11,8 @@ beforeAll(async () => {
     const bundlerConfig = UniwindBundlerConfig.fromMetroConfig({
         cssEntryFile: './tests/test.css',
     }, Platform.iOS)
+    await bundlerConfig.generateArtifacts('./uniwind.css')
+    rmSync('uniwind-types.d.ts', { force: true })
     const virtualCode = await compileCSS(bundlerConfig)
 
     eval(

@@ -9,6 +9,18 @@ import { nativeResolver, webResolver } from './resolvers'
 
 const isUniwindRequest = (moduleName: string) => moduleName === 'uniwind' || moduleName.startsWith('uniwind/')
 
+const isExpoMetroConfig = (config: MetroConfig) => {
+    const transformerPath = config.transformerPath
+    const hasExpoTransformerField = Object.keys(config.transformer ?? {}).some(
+        key => key.startsWith('expo') || key.startsWith('_expo'),
+    )
+
+    return Boolean(
+        transformerPath?.includes('@expo/metro-config')
+            || hasExpoTransformerField,
+    )
+}
+
 export const withUniwindConfig = <T extends MetroConfig>(
     config: T,
     uniwindConfig: UniwindConfig,
@@ -24,7 +36,7 @@ export const withUniwindConfig = <T extends MetroConfig>(
         transformerPath: require.resolve('./transformer.cjs'),
         transformer: {
             ...config.transformer,
-            uniwind: bundlerConfig.toMetroConfig(),
+            uniwind: bundlerConfig.toMetroConfig(isExpoMetroConfig(config)),
         },
         resolver: {
             ...config.resolver,

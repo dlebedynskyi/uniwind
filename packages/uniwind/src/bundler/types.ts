@@ -11,5 +11,6 @@ export type Polyfills = {
 export type UniwindMetroConfig = UniwindConfig & {
     polyfills?: Polyfills
     debug?: boolean
+    isExpoProject?: boolean
     isTV?: boolean
 }

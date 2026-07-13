@@ -113,6 +113,7 @@ Metro integration:
 - `withUniwindConfig(config, uniwindConfig)` patches Metro graph support for uncached modules.
 - Metro adds `css` as source extension and removes it from asset extensions.
 - Metro transformer handles the configured CSS entry file specially.
+- Metro transformer worker selection is lazy, cached per Expo/non-Expo config type, and follows Expo transformer paths or Expo-specific config markers.
 - Native platform CSS transforms into a JS module that calls `Uniwind.__reinit(...)`.
 - Web platform CSS transforms into CSS plus web runtime setup.
 - Resolver swaps React Native component imports to Uniwind-aware implementations where needed.

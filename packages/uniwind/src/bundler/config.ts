@@ -83,8 +83,11 @@ export class UniwindBundlerConfig {
         return `[${this.themes.map((theme) => `'${theme}'`).join(', ')}]`
     }
 
-    toMetroConfig() {
-        return this.config
+    toMetroConfig(isExpoProject: boolean): UniwindMetroConfig {
+        return {
+            ...this.config,
+            isExpoProject,
+        }
     }
 
     async generateArtifacts(cssArtifactPath: string) {

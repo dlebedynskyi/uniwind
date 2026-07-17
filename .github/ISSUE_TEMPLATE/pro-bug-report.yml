@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## Pro User Bug Report 〰
+        ## Pro User Bug Report
 
         Thank you for being a Pro user! Your issue will receive priority attention.
 
@@ -82,7 +82,7 @@ body:
 
   - type: checkboxes
     attributes:
-        label: Additional information
+        label: Additional information 〰
         description: Please check all the boxes that apply
         options:
           - label: I've searched for [similar issues in this repository](https://github.com/uni-stack/uniwind/issues) and found none

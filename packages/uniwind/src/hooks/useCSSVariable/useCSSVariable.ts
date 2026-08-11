@@ -59,8 +59,9 @@ export type GetCSSVariable = {
  */
 export const useCSSVariable: GetCSSVariable = (name: string | Array<string>) => {
     const uniwindContext = useUniwindContext()
-    const [value, setValue] = useState(getCSSVariable(name, uniwindContext))
+    const [value, setValue] = useState(() => getCSSVariable(name, uniwindContext))
     const nameRef = useRef(name)
+    const isMountRef = useRef(true)
 
     useLayoutEffect(() => {
         if (Array.isArray(name) && Array.isArray(nameRef.current)) {
@@ -82,6 +83,14 @@ export const useCSSVariable: GetCSSVariable = (name: string | Array<string>) => 
 
     useLayoutEffect(() => {
         const updateValue = () => setValue(getCSSVariable(nameRef.current, uniwindContext))
+
+        // Skip mount as useState already resolved the value, recompute only when the context changes
+        if (isMountRef.current) {
+            isMountRef.current = false
+        } else {
+            updateValue()
+        }
+
         const dispose = UniwindListener.subscribe(
             updateValue,
             [StyleDependency.Theme, StyleDependency.Variables],

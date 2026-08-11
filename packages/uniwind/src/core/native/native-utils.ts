@@ -1,5 +1,41 @@
 import { formatHex, formatHex8, interpolate, parse } from 'culori'
-import type { UniwindRuntime } from '../types'
+import type { CSSVariables, UniwindRuntime, Var, Vars } from '../types'
+
+const scopedVarsCache = new WeakMap<CSSVariables, Vars>()
+
+// Normalizes a CSS variable value (numbers pass through, colors -> hex) and wraps it in a lazy getter
+export const createVarGetter = (value: string | number): Var => () => {
+    if (typeof value === 'number') {
+        return value
+    }
+
+    const parsedColor = parse(value)
+
+    if (parsedColor) {
+        return parsedColor.alpha === undefined || parsedColor.alpha === 1
+            ? formatHex(parsedColor)
+            : formatHex8(parsedColor)
+    }
+
+    return value
+}
+
+export const getScopedVars = (variables: CSSVariables): Vars => {
+    const cachedVars = scopedVarsCache.get(variables)
+
+    if (cachedVars) {
+        return cachedVars
+    }
+
+    const vars = Object.fromEntries(
+        Object.entries(variables)
+            .map(([name, value]) => [name, createVarGetter(value)]),
+    ) as Vars
+
+    scopedVarsCache.set(variables, vars)
+
+    return vars
+}
 
 export const colorMix = (color: string, weight: number | string, mixColor: string) => {
     const parsedWeight = typeof weight === 'string'

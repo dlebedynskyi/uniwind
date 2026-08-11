@@ -1,10 +1,11 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
+import { describe, expect, test, vi } from 'vitest'
 import { Uniwind, useCSSVariable } from '../../../src'
 import { CSSListener } from '../../../src/core/web'
 
 describe('CSSListener', () => {
     test('notifies class subscribers when a stylesheet loads, unloads, and reloads', async () => {
-        const listener = jest.fn()
+        const listener = vi.fn()
         const dispose = CSSListener.subscribeToClassName('remote-class', listener)
 
         const style = document.createElement('style')
@@ -50,10 +51,10 @@ describe('CSSListener', () => {
 
         Object.defineProperty(window, 'matchMedia', {
             configurable: true,
-            value: jest.fn(() => mediaQueryList),
+            value: vi.fn(() => mediaQueryList),
         })
 
-        const listener = jest.fn()
+        const listener = vi.fn()
         const dispose = CSSListener.subscribeToClassName('rma:md:bg-blue-500', listener)
         const style = document.createElement('style')
 
@@ -67,11 +68,13 @@ describe('CSSListener', () => {
             })
 
             listener.mockClear()
+            const snapshot = CSSListener.getSnapshot('rma:md:bg-blue-500')
             mediaQueryList.matches = true
             mediaListeners.forEach(mediaListener => mediaListener(new Event('change')))
 
             expect(Array.from(CSSListener.activeRules).some(rule => rule.selectorText === '.rma\\:md\\:bg-blue-500')).toBe(true)
             expect(listener).toHaveBeenCalled()
+            expect(CSSListener.getSnapshot('rma:md:bg-blue-500')).not.toBe(snapshot)
         } finally {
             dispose()
             style.remove()

@@ -1,4 +1,28 @@
-## What's Changed in 1.10.1
+## What's Changed in 1.11.0
+
+
+
+### 🚀 Features
+* feat: add filter support on iOS and React Native 0.87 canary by @jpudysz in [#631](https://github.com/uni-stack/uniwind/pull/631)
+* Feat/scoped variables by @dlebedynskyi in [#611](https://github.com/uni-stack/uniwind/pull/611)
+
+
+### 🐛 Bug Fixes
+* fix: align uniwind types with latest react native 0.87 by @jpudysz in [#627](https://github.com/uni-stack/uniwind/pull/627)
+* fix: web rn bundling by adding browser exports field by @Brentlok in [#624](https://github.com/uni-stack/uniwind/pull/624)
+
+
+### 🏠 Chores
+* chore: remove filterFn and create string directly by @Brentlok in [#632](https://github.com/uni-stack/uniwind/pull/632)
+* chore: dont pass dataSet if none data-* were provided to withUniwind component by @Brentlok in [#630](https://github.com/uni-stack/uniwind/pull/630)
+* chore: update color scheme handling for React Native 0.87 compatibility by @jpudysz in [#628](https://github.com/uni-stack/uniwind/pull/628)
+* chore: resolve dataSet to undefined when to data-set prop was provided by @Brentlok in [#629](https://github.com/uni-stack/uniwind/pull/629)
+* chore: typecheck tests by @Brentlok in [#626](https://github.com/uni-stack/uniwind/pull/626)
+
+
+### New Contributors
+* @dlebedynskyi made their first contribution in [#611](https://github.com/uni-stack/uniwind/pull/611)
+**Full Changelog**: https://github.com/uni-stack/uniwind/compare/v1.10.1...v1.11.0## What's Changed in 1.10.1
 
 
 

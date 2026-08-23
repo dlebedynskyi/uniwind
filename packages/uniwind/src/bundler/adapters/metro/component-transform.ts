@@ -362,7 +362,7 @@ export const componentTransform = ({ types }: { types: typeof t }): PluginObj =>
                         return
                     }
 
-                    component.replaceWith(getRawIdentifier(componentName))
+                    component.replaceWith(types.cloneNode(getRawIdentifier(componentName)))
                 },
             })
 
@@ -370,7 +370,14 @@ export const componentTransform = ({ types }: { types: typeof t }): PluginObj =>
                 return
             }
 
-            const specifiers = Array.from(rawIdentifiers, ([componentName, local]) => types.importSpecifier(local, types.identifier(componentName)))
+            const specifiers = Array.from(
+                rawIdentifiers,
+                ([componentName, local]) =>
+                    types.importSpecifier(
+                        types.cloneNode(local),
+                        types.identifier(componentName),
+                    ),
+            )
             const declaration = types.importDeclaration(
                 specifiers,
                 types.stringLiteral(RAW_COMPONENTS_MODULE),

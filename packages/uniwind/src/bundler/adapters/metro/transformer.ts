@@ -70,7 +70,8 @@ export const transform = async (
     await bundlerConfig.generateArtifacts(cssArtifactPath)
     const virtualCode = await compileCSS(bundlerConfig)
     const isWeb = bundlerConfig.platform === Platform.Web
-    const nativeStylesFingerprint = isWeb
+    const federation = bundlerConfig.federation
+    const nativeStylesFingerprint = isWeb || federation?.role === 'remote'
         ? undefined
         : createHash('sha256')
             .update(virtualCode)
@@ -81,6 +82,12 @@ export const transform = async (
     data = Buffer.from(
         isWeb
             ? virtualCode
+            : federation?.role === 'remote'
+            ? [
+                `const { Uniwind } = require('uniwind');`,
+                `const dispose = Uniwind.__mergeStyles(${JSON.stringify(federation.id)}, rt => ${virtualCode}, ${bundlerConfig.stringifiedThemes});`,
+                `if (module.hot) { module.hot.dispose(dispose); }`,
+            ].join('')
             : [
                 `const { Uniwind } = require('uniwind');`,
                 `Uniwind.__reinit(rt => ${virtualCode}, ${bundlerConfig.stringifiedThemes}, '${nativeStylesFingerprint}');`,

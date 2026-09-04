@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useReducer, useRef } from 'react'
 import { Platform } from 'react-native'
 import { StyleDependency } from '../../common/consts'
 import { arrayEquals } from '../../common/utils'
@@ -12,7 +12,12 @@ let warned = false
 
 const logDevError = (name: string) => {
     // Silent warnings for SSR
-    if (Platform.OS === 'web' && (typeof document === 'undefined' || typeof window === 'undefined')) {
+    const globalScope = globalThis as {
+        document?: unknown
+        window?: unknown
+    }
+
+    if (Platform.OS === 'web' && (globalScope.document === undefined || globalScope.window === undefined)) {
         return
     }
 
@@ -52,6 +57,8 @@ export type GetCSSVariable = {
     ): IsGenericNumber<T['length']> extends true ? Array<string | number | undefined> : CreateArray<T['length'], string | number | undefined>
 }
 
+const subscribe = (callback: () => void) => UniwindListener.subscribe(callback, [StyleDependency.Theme, StyleDependency.Variables])
+
 /**
  * A hook that returns the value of a CSS variable.
  * @param name Name / Array of names of the CSS variable.
@@ -59,45 +66,48 @@ export type GetCSSVariable = {
  */
 export const useCSSVariable: GetCSSVariable = (name: string | Array<string>) => {
     const uniwindContext = useUniwindContext()
-    const [value, setValue] = useState(() => getCSSVariable(name, uniwindContext))
     const nameRef = useRef(name)
-    const isMountRef = useRef(true)
 
-    useLayoutEffect(() => {
-        if (Array.isArray(name) && Array.isArray(nameRef.current)) {
-            if (arrayEquals(name, nameRef.current)) {
-                return
+    if (
+        name !== nameRef.current
+        && (!Array.isArray(name) || !Array.isArray(nameRef.current) || !arrayEquals(name, nameRef.current))
+    ) {
+        nameRef.current = name
+    }
+
+    const stableName = nameRef.current
+    const getSnapshot = useMemo(() => {
+        let snapshot: string | number | undefined | Array<string | number | undefined>
+        let initialized = false
+
+        return () => {
+            const nextSnapshot = getCSSVariable(stableName, uniwindContext)
+
+            if (
+                initialized
+                && (nextSnapshot === snapshot
+                    || (Array.isArray(nextSnapshot) && Array.isArray(snapshot) && arrayEquals(nextSnapshot, snapshot)))
+            ) {
+                return snapshot
             }
 
-            setValue(getCSSVariable(name, uniwindContext))
-            nameRef.current = name
+            initialized = true
+            snapshot = nextSnapshot
 
-            return
+            return snapshot
         }
+    }, [stableName, uniwindContext])
 
-        if (name !== nameRef.current) {
-            setValue(getCSSVariable(name, uniwindContext))
-            nameRef.current = name
-        }
-    }, [name])
+    const [snapshot, rerender] = useReducer(getSnapshot, undefined, getSnapshot)
+    const currentSnapshot = getSnapshot()
 
     useLayoutEffect(() => {
-        const updateValue = () => setValue(getCSSVariable(nameRef.current, uniwindContext))
-
-        // Skip mount as useState already resolved the value, recompute only when the context changes
-        if (isMountRef.current) {
-            isMountRef.current = false
-        } else {
-            updateValue()
+        if (getSnapshot() !== snapshot) {
+            rerender()
         }
 
-        const dispose = UniwindListener.subscribe(
-            updateValue,
-            [StyleDependency.Theme, StyleDependency.Variables],
-        )
+        return subscribe(rerender)
+    }, [subscribe, getSnapshot])
 
-        return dispose
-    }, [uniwindContext])
-
-    return value as never
+    return currentSnapshot as never
 }

@@ -1,4 +1,34 @@
-## What's Changed in 1.11.0
+## What's Changed in 1.12.0
+
+
+
+### 🚀 Features
+* feat: support drop-shadow filter function by @feri-irawan in [#645](https://github.com/uni-stack/uniwind/pull/645)
+
+
+### 🐛 Bug Fixes
+* fix: read variant tokens from flattened class selectors by @juliusmarminge in [#662](https://github.com/uni-stack/uniwind/pull/662)
+* fix: drop frozen listeners by @Brentlok in [#660](https://github.com/uni-stack/uniwind/pull/660)
+* fix: use useSyncExternalStore in withUniwind for better compatibility with react lifecycle by @Brentlok in [#657](https://github.com/uni-stack/uniwind/pull/657)
+* fix: skip unchanged native stylesheet reinitialization by @juliusmarminge in [#652](https://github.com/uni-stack/uniwind/pull/652)
+* fix: useSyncExternalStore in state hooks for better compatibility with react lifecycle by @Brentlok in [#650](https://github.com/uni-stack/uniwind/pull/650)
+* fix: web lazy components not hot reloading css by @Brentlok in [#646](https://github.com/uni-stack/uniwind/pull/646)
+* fix: handle symlinked uniwind origins in metro resolver by @joedeleeuw in [#609](https://github.com/uni-stack/uniwind/pull/609)
+
+
+### 🧪 Testing
+* test: migrate web tests to vitest by @Brentlok in [#647](https://github.com/uni-stack/uniwind/pull/647)
+
+
+### 🏠 Chores
+* chore: fix tests typecheck by @Brentlok in [#637](https://github.com/uni-stack/uniwind/pull/637)
+
+
+### New Contributors
+* @juliusmarminge made their first contribution in [#662](https://github.com/uni-stack/uniwind/pull/662)
+* @feri-irawan made their first contribution in [#645](https://github.com/uni-stack/uniwind/pull/645)
+* @joedeleeuw made their first contribution in [#609](https://github.com/uni-stack/uniwind/pull/609)
+**Full Changelog**: https://github.com/uni-stack/uniwind/compare/v1.11.0...v1.12.0## What's Changed in 1.11.0
 
 
 

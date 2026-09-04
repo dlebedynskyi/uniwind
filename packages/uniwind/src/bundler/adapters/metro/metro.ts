@@ -3,9 +3,9 @@ import type { UniwindMetroConfig } from '@/bundler/types'
 import { Platform } from '@/common/consts'
 import type { MetroConfig } from 'metro-config'
 import type { CustomResolver } from 'metro-resolver'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { RAW_COMPONENTS_MODULE } from './constants'
-import { cacheStore, patchMetroGraphToSupportUncachedModules } from './patches'
+import { cacheStore, patchMetroGraphToIncludeCssInLazyGraphs, patchMetroGraphToSupportUncachedModules } from './patches'
 import { nativeResolver, webResolver } from './resolvers'
 
 const isUniwindRequest = (moduleName: string) => moduleName === 'uniwind' || moduleName.startsWith('uniwind/')
@@ -36,6 +36,7 @@ export const withUniwindConfig = <T extends MetroConfig>(
         )
         : undefined
 
+    patchMetroGraphToIncludeCssInLazyGraphs(resolve(process.cwd(), uniwindConfig.cssEntryFile))
     patchMetroGraphToSupportUncachedModules()
 
     return {

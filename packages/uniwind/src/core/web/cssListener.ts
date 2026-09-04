@@ -96,6 +96,7 @@ type StyleSheetContext = {
 class CSSListenerBuilder {
     activeRules = new Set<CSSStyleRule>()
     private classNameListeners = new Map<string, Set<VoidFunction>>()
+    private classNameRevisions = new Map<string, number>()
     private mediaChangeStyleSheetContext: StyleSheetContext | undefined
     private mediaQueryRuleListeners = new Map<CSSStyleRule, {
         listener: VoidFunction
@@ -154,6 +155,17 @@ class CSSListenerBuilder {
             attributes: true,
             attributeFilter: ['disabled', 'media', 'title', 'href', 'rel'],
         })
+    }
+
+    getSnapshot(classNames: string) {
+        const classNameSnapshot = classNames
+            .split(' ')
+            .filter(Boolean)
+            .map(className => this.classNameRevisions.get(className) ?? 0)
+            .join(':')
+        const themeSnapshot = UniwindListener.getSnapshot([StyleDependency.Theme, StyleDependency.Variables])
+
+        return `${themeSnapshot}:${classNameSnapshot}`
     }
 
     subscribeToClassName(classNames: string, listener: VoidFunction) {
@@ -536,6 +548,7 @@ class CSSListenerBuilder {
     }
 
     private notifyClassName(className: string) {
+        this.classNameRevisions.set(className, (this.classNameRevisions.get(className) ?? 0) + 1)
         this.classNameListeners.get(className)?.forEach(listener => listener())
     }
 

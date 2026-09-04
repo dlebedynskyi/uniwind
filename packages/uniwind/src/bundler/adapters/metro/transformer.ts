@@ -5,6 +5,7 @@ import { Platform } from '@/common/consts'
 import type * as ExpoMetroConfig from '@expo/metro-config'
 import type * as MetroTransformWorker from 'metro-transform-worker'
 import type { JsTransformerConfig, JsTransformOptions } from 'metro-transform-worker'
+import { createHash } from 'node:crypto'
 import path from 'path'
 import {
     TRANSFORM_COMPONENTS,
@@ -109,6 +110,13 @@ export const transform = async (
     const virtualCode = await compileCSS(bundlerConfig)
     const isWeb = bundlerConfig.platform === Platform.Web
     const federation = bundlerConfig.federation
+    const nativeStylesFingerprint = isWeb || federation?.role === 'remote'
+        ? undefined
+        : createHash('sha256')
+            .update(virtualCode)
+            .update('\0')
+            .update(bundlerConfig.stringifiedThemes)
+            .digest('hex')
 
     data = Buffer.from(
         isWeb
@@ -121,7 +129,7 @@ export const transform = async (
             ].join('')
             : [
                 `const { Uniwind } = require('uniwind');`,
-                `Uniwind.__reinit(rt => ${virtualCode}, ${bundlerConfig.stringifiedThemes});`,
+                `Uniwind.__reinit(rt => ${virtualCode}, ${bundlerConfig.stringifiedThemes}, '${nativeStylesFingerprint}');`,
             ].join(''),
         'utf-8',
     )

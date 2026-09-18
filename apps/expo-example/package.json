@@ -10,7 +10,7 @@
         "web": "expo start --web"
     },
     "dependencies": {
-        "@expo/metro-runtime": "57.0.2",
+        "@expo/metro-runtime": "catalog:",
         "expo": "catalog:",
         "expo-splash-screen": "57.0.1",
         "expo-status-bar": "57.0.0",

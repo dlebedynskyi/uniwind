@@ -3,12 +3,42 @@ import type { UniwindMetroConfig } from '@/bundler/types'
 import { Platform } from '@/common/consts'
 import type { MetroConfig } from 'metro-config'
 import type { CustomResolver } from 'metro-resolver'
-import { dirname, join, resolve } from 'node:path'
+import { realpathSync } from 'node:fs'
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 import { RAW_COMPONENTS_MODULE } from './constants'
 import { cacheStore, patchMetroGraphToIncludeCssInLazyGraphs, patchMetroGraphToSupportUncachedModules } from './patches'
 import { nativeResolver, webResolver } from './resolvers'
 
 const isUniwindRequest = (moduleName: string) => moduleName === 'uniwind' || moduleName.startsWith('uniwind/')
+
+const getRealPath = (filePath: string) => {
+    try {
+        return realpathSync(filePath)
+    } catch {
+        return filePath
+    }
+}
+
+const isPathWithin = (filePath: string, directory: string) => {
+    const relativePath = relative(directory, filePath)
+
+    return relativePath === '' || (!relativePath.startsWith('..') && !isAbsolute(relativePath))
+}
+
+const getOwningUniwindRoot = (filePath: string) => {
+    const realFilePath = getRealPath(filePath)
+
+    try {
+        const packageJsonPath = require.resolve('uniwind/package.json', {
+            paths: [dirname(realFilePath)],
+        })
+        const packageRoot = dirname(getRealPath(packageJsonPath))
+
+        return isPathWithin(realFilePath, packageRoot) ? packageRoot : undefined
+    } catch {
+        return undefined
+    }
+}
 
 const isExpoMetroConfig = (config: MetroConfig) => {
     const transformerPath = config.transformerPath
@@ -28,10 +58,11 @@ export const withUniwindConfig = <T extends MetroConfig>(
 ): T => {
     const bundlerConfig = UniwindBundlerConfig.fromMetroConfig(uniwindConfig)
     const pinnedUniwindOrigin = join(config.projectRoot ?? process.cwd(), 'package.json')
+    const activeUniwindRoot = dirname(getRealPath(require.resolve('uniwind/package.json')))
     const optimizeClasslessComponents = uniwindConfig.experimental?.optimizeClasslessComponents === true
     const rawComponentsPath = optimizeClasslessComponents
         ? join(
-            dirname(require.resolve('uniwind/package.json')),
+            activeUniwindRoot,
             'src/bundler/adapters/metro/raw-components.ts',
         )
         : undefined
@@ -67,14 +98,27 @@ export const withUniwindConfig = <T extends MetroConfig>(
                     }
 
                     if (isUniwindRequest(nextModuleName)) {
-                        return baseResolver(
-                            {
-                                ...nextContext,
-                                originModulePath: pinnedUniwindOrigin,
-                            },
-                            nextModuleName,
-                            nextPlatform,
-                        )
+                        const pinnedContext = {
+                            ...nextContext,
+                            originModulePath: pinnedUniwindOrigin,
+                        }
+
+                        try {
+                            const resolution = baseResolver(nextContext, nextModuleName, nextPlatform)
+
+                            if (resolution.type !== 'sourceFile') {
+                                return resolution
+                            }
+
+                            const owningUniwindRoot = getOwningUniwindRoot(resolution.filePath)
+                            if (!owningUniwindRoot || owningUniwindRoot === activeUniwindRoot) {
+                                return resolution
+                            }
+                        } catch {
+                            // Fall back to the active project installation below.
+                        }
+
+                        return baseResolver(pinnedContext, nextModuleName, nextPlatform)
                     }
 
                     return baseResolver(nextContext, nextModuleName, nextPlatform)
